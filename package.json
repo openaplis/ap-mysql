@@ -1,6 +1,6 @@
 {
   "name": "ap-mysql",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "ap-mysql",
   "main": "index.js",
   "scripts": {

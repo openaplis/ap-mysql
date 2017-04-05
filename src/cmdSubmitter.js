@@ -3,16 +3,11 @@ var deepDiff = require('deep-diff')
 var clone = require('clone')
 var mysql = require('mysql')
 var _ = require('lodash')
-
-var connection = mysql.createConnection({
-  host     : '10.1.2.26',
-  user     : 'sqldude',
-  password : '123Whatsup',
-  database : 'lis',
-  multipleStatements: true,
-})
+var path = require('path')
+var mysqlConfig = require(path.resolve('../ap-secrets/secrets/mysql-config/mysqlConfig'))
 
 module.exports.submit = (sql, callback) => {
+  var connection = mysql.createConnection(mysqlConfig.secret)
   connection.connect()
 
   var query = connection.query(sql)
@@ -25,7 +20,7 @@ module.exports.submit = (sql, callback) => {
     .on('fields', function(fields) {
       // the field packets for the rows to follow
     })
-    .on('result', function(row) {      
+    .on('result', function(row) {
       rows.push(Object.assign({}, row))
     })
     .on('end', function() {

@@ -3,5 +3,7 @@
 const cmdBuilder = require('./core/cmdBuilder')
 const cmdSubmitter = require('./core/cmdSubmitter')
 
-exports = module.exports = cmdBuilder
-exports = module.exports = cmdSubmitter
+exports = module.exports = {
+  cmdBuilder = cmdBuilder,
+  cmdSubmitter = cmdSubmitter
+}

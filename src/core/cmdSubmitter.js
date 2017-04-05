@@ -20,7 +20,7 @@ module.exports.submit = (sql, callback) => {
     .on('fields', function(fields) {
       // the field packets for the rows to follow
     })
-    .on('result', function(row) {
+    .on('result', function(row) {      
       rows.push(Object.assign({}, row))
     })
     .on('end', function() {

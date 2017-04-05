@@ -1,5 +1,7 @@
 'use strict'
 
-const mysql = require('./core')
+const cmdBuilder = require('./core/cmdBuilder')
+const cmdSubmitter = require('./core/cmdSubmitter')
 
-exports = module.exports = mysql
+exports = module.exports = cmdBuilder
+exports = module.exports = cmdSubmitter

@@ -1,38 +1,16 @@
-var mysql = require('mysql')
 var _ = require('lodash')
 
-var connection = mysql.createConnection()
+module.exports.build = (rows, callback) => {
+  var accessionOrder = {}
 
-connection.connect()
-//var query = connection.query('Set @ClientName = \'Internal Medicine, SVH Clinic\'; CALL sidtest(@ClientName);')
-var query = connection.query('Set @MasterAccessionNo = \'17-16\'; CALL prcGetAccessionOrder(@MasterAccessionNo);')
-
-var accessionOrder = {}
-var rows = []
-
-query
-  .on('error', function(err) {
-    // Handle error, an 'end' event will be emitted after this as well
-  })
-  .on('fields', function(fields) {
-    // the field packets for the rows to follow
-  })
-  .on('result', function(row) {
-    rows.push(Object.assign({}, row))
-  })
-  .on('end', function() {
-    assembleRows()
-    console.log(accessionOrder)
-  })
-
-connection.end()
-
-function assembleRows() {
   accessionOrder = _.find(rows, function(o) { return o.tablename == 'tblAccessionOrder'})
 
   accessionOrder.PanelSetOrders = _.filter(rows, function(o) { return o.tablename =='tblPanelSetOrder' })
   if(!accessionOrder.PanelSetOrders) accessionOrder.PanelSetOrders = []
   accessionOrder.PanelSetOrders.map(function (pso) {
+      pso.TaskOrders = _.filter(rows, function(o) { return o.tablename =='tblTaskOrder' })
+      if(!pso.TaskOrders) pso.TaskOrders = []
+
       pso.PanelOrders = _.filter(rows, function(o) { return o.tablename =='tblPanelOrder' })
       if(!pso.PanelOrders) pso.PanelOrders = []
       pso.PanelOrders.map(function (po) {
@@ -51,4 +29,6 @@ function assembleRows() {
         if(!alo.SlideOrders) alo.SlideOrders = []
       })
   })
+
+  callback(null, accessionOrder)
 }

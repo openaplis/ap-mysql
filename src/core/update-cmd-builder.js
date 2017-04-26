@@ -2,23 +2,25 @@
 
 var _ = require('lodash')
 var path = require('path')
+var deepDiff = require('deep-diff')
 var fs = require('fs')
 var levelup = require('levelup')
 var async = require('async')
 
 var objectPath = './src/core/object/'
 
-module.exports.buildUpdateCommands = (deepDiff, obj, callback) => {
-  var groupedDiffEdits = groupDiffEdits(deepDiff, 'E')
+module.exports.build = (obj, objClone, callback) => {
+  var diff = deepDiff(objClone, obj)
+  var groupedDiffEdits = groupDiffEdits(diff, 'E')
   var statements = []
 
   var diffEditKeys = _.keys(groupedDiffEdits)
   async.each(diffEditKeys, function (diffEditKey, next) {
 
     var diffEdits = _.get(groupedDiffEdits, diffEditKey)
-    var objectMapPath = path.join(objectPath, diffEditKey + '.json')    
+    var objectMapPath = path.join(objectPath, diffEditKey + '.json')
     fs.readFile(objectMapPath, function (err, value) {
-      if (err) return console.log('There was an error finding your key: ' + diffEditKey)
+      if (err) return callback(err)
       var objectMap = JSON.parse(value)
       var statement = {
         type: 'update',
@@ -28,32 +30,6 @@ module.exports.buildUpdateCommands = (deepDiff, obj, callback) => {
       statements.push(statement)
       next()
     })
-  }, function (err) {
-    callback(null, statements)
-  })
-}
-
-module.exports.buildInsertCommands = (deepDiff, obj, callback) => {
-  var diffArrays = _.filter(deepDiff, function (o) { return o.kind == 'A'})
-  var statements = []
-
-  async.each(diffArrays, function (diffArray, next) {
-
-    var colMap = _.find(collectionMap, function (o) { return o.collectionName == diffArray.path[diffArray.path.length - 1] })
-    db.get(colMap.objectName, function (err, value) {
-      if (err) return console.log('There was an error finding your key: ' + objectName, err)
-      var objectMap = JSON.parse(value)
-
-      var statement = {
-        type: 'insert',
-        cmd: 'insert ' + colMap.tableName + '(' + getInsertFieldList(diffArray) + ') values (' + getInsertValueList(diffArray, objectMap) + ')'
-      }
-
-      statements.push(statement)
-
-      next()
-    })
-
   }, function (err) {
     callback(null, statements)
   })

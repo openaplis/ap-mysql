@@ -9,10 +9,11 @@ module.exports.submit = (sql, callback) => {
 
   var query = connection.query(sql)
   var rows = []
+  var error = null;
 
   query
     .on('error', function(err) {
-      callback(err)
+      error = err
     })
     .on('fields', function(fields) {
       // the field packets for the rows to follow
@@ -21,6 +22,7 @@ module.exports.submit = (sql, callback) => {
       rows.push(Object.assign({}, row))
     })
     .on('end', function() {
+      if(error) return callback(error)
       callback(null, rows)
     })
 

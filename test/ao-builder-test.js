@@ -53,7 +53,7 @@ describe('aoBuilder', function() {
 
     it('TaskOrders.', function(done) {
       assert.equal(testAO.AccessionOrder.PanelSetOrders[0].PanelSetOrder.TaskOrders.length, 0, 'Number of TaskOrders on first PanelSetOrder is not correct.')
-      assert.equal(testAO.AccessionOrder.PanelSetOrders[1].PanelSetOrder.TaskOrders.length, 0, 'Number of TaskOrders on second PanelSetOrder is not correct.')
+      assert.equal(testAO.AccessionOrder.PanelSetOrders[1].PanelSetOrder.TaskOrders.length, 2, 'Number of TaskOrders on second PanelSetOrder is not correct.')
       done()
     })
 

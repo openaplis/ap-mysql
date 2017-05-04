@@ -11,8 +11,25 @@ fs.readdir(dir, (err, files) => {
       obj.objectName = camelCase.toLower(obj.objectName)
 
       obj.fields.forEach(field => {
+        if(field.name.charAt(1).toUpperCase() == field.name.charAt(1)) {
+            console.log(file + ": " + field.name)
+        }
+      })
+    })
+  });
+})
+
+/*
+fs.readdir(dir, (err, files) => {
+  files.forEach(file => {
+    fs.readFile(path.join(__dirname, 'object', file), function (err, data) {
+      if(err) return console.log(err)
+      var obj = JSON.parse(data)
+      obj.objectName = camelCase.toLower(obj.objectName)
+
+      obj.fields.forEach(field => {
         field.sqlName = field.name
-        field.name = camelCase.toLower(field.name)        
+        field.name = camelCase.toLower(field.name)
       })
 
       var dataOut = JSON.stringify(obj)
@@ -22,3 +39,4 @@ fs.readdir(dir, (err, files) => {
     })
   });
 })
+*/

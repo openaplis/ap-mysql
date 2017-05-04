@@ -31,35 +31,20 @@ module.exports.build = (obj, objClone, callback) => {
       next()
     })
   }, function (err) {
+    if(err) return callback(err)
     callback(null, statements)
   })
-}
-
-function getInsertFieldList(diffArray) {
-  var fields = ''
-  _.forOwn(diffArray.item.rhs, function (value, key) {
-    fields += key + ", "
-  })
-  return fields.substring(0, fields.length - 2)
-}
-
-function getInsertValueList(diffArray, objectMap) {
-  var fields = ''
-  _.forOwn(diffArray.item.rhs, function (value, key) {
-    if(typeof(value) == 'boolean' || typeof(value) == 'number') {
-      fields += value + ', '
-    } else if(typeof(value) == 'string') {
-      fields += '\'' + value + '\', '
-    }
-  })
-  return fields.substring(0, fields.length - 2)
 }
 
 function getSetFieldList(diffEdits, objectMap) {
   var fields = ''
   diffEdits.map(function (diffEdit) {
     var fieldName = diffEdit.path[diffEdit.path.length - 1]
-    fields += fieldName + ' = ' + getFieldValue(diffEdit, objectMap, fieldName) + ", "
+    var field = _.find(objectMap.fields, function (o) {
+      return o.name == fieldName
+    })
+
+    fields += field.sqlName + ' = ' + getFieldValue(diffEdit, objectMap, fieldName) + ", "
   })
   return fields.substring(0, fields.length - 2)
 }
@@ -78,7 +63,7 @@ function getTableName(diffEdit) {
 }
 
 function getFieldValue(diffEdit, objectMap, fieldName) {
-  var field = _.find(objectMap.fields, function(o) { return o.name == fieldName })
+  var field = _.find(objectMap.fields, function(o) { return o.name == fieldName })  
   if (field.dataType == 'string') {
     return '\'' + diffEdit.rhs + '\''
   } else {
@@ -93,10 +78,10 @@ function getWhereClause(diffEdits, objectMap, clone) {
   var pkValue = _.get(clone, modifiedPath)
 
   if(pk.dataType == 'string') {
-    return ' where ' + pk.name + ' = \'' + pkValue + "\'"
+    return ' where ' + pk.sqlName + ' = \'' + pkValue + "\'"
   }
   else {
-    return ' where ' + pk.name + ' = ' + pkValue
+    return ' where ' + pk.sqlName + ' = ' + pkValue
   }
 }
 

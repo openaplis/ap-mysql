@@ -1,14 +1,1 @@
-{
-  "objectName": "ExtractAndHoldForMolecularTestOrder",
-  "tableName": "tblExtractAndHoldForMolecularTestOrder",
-  "fields": [
-    {
-      "isPrimaryKey": false,
-      "name": "Comment",
-      "width": "50",
-      "dataType": "string",
-      "defaultValue": "null",
-      "isNullable": "True"
-    }
-  ]
-}
+{"objectName":"extractAndHoldForMolecularTestOrder","tableName":"tblExtractAndHoldForMolecularTestOrder","fields":[{"isPrimaryKey":false,"name":"comment","width":"50","dataType":"string","defaultValue":"null","isNullable":"True","sqlName":"Comment"}]}

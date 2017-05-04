@@ -1,0 +1,1 @@
+{"objectName":"grossOnlyTestOrder","tableName":"tblGrossOnlyTestOrder","fields":[{"isPrimaryKey":false,"name":"grossX","width":"-1","dataType":"string","defaultValue":"null","isNullable":"True","sqlName":"GrossX"}]}

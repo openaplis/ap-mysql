@@ -6,7 +6,7 @@ const aoBuilder = require(path.resolve('./src/core/ao-builder'))
 
 var masterAccessionNo = '17-8171'
 var testDataRowsFilePath = './test/test-data-rows.' + masterAccessionNo + '.json'
-var testDataObjectFilePath = './test/test-data-object.' + masterAccessionNo + '.json'
+var testDataObjectFilePath = './test/test-data.' + masterAccessionNo + '.json'
 
 var sql = 'Set @MasterAccessionNo = \'' + masterAccessionNo + '\'; CALL prcGetAccessionOrder_2(@MasterAccessionNo);'
 

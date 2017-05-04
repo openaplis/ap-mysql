@@ -1,11 +1,12 @@
 var _ = require('lodash')
+var camelCase = require('./camel-case')
 
 module.exports.build = (rows, callback) => {
-  var aoRaw = _.find(rows, function(o) { return o.tablename == 'tblAccessionOrder'})
+  var aoRaw = camelCase.toLower(_.find(rows, function(o) { return o.tablename == 'tblAccessionOrder'}))
   delete aoRaw.tablename
 
   var ao = {
-    AccessionOrder: aoRaw
+    accessionOrder: aoRaw
   }
 
   buildPanelSetOrders(ao, rows)
@@ -14,110 +15,110 @@ module.exports.build = (rows, callback) => {
 }
 
 function buildSpecimenOrders(ao, rows) {
-  ao.AccessionOrder.SpecimenOrders = []
-  var specimenOrders = _.filter(rows, function(o) { return o.tablename =='tblSpecimenOrder' })
+  ao.accessionOrder.specimenOrders = []
+  var specimenOrders = camelCase.toLower(_.filter(rows, function(o) { return o.tablename =='tblSpecimenOrder' }))
 
   specimenOrders.map(function (soRaw) {
     delete soRaw.tablename
     var so = {
-      SpecimenOrder: soRaw
+      specimenOrder: soRaw
     }
 
     buildAliquotOrders(so, rows)
-    ao.AccessionOrder.SpecimenOrders.push(so)
+    ao.accessionOrder.specimenOrders.push(so)
   })
 }
 
 function buildAliquotOrders(so, rows) {
-  so.SpecimenOrder.AliquotOrders = []
-  var aliquotOrders = _.filter(rows, function(o) { return o.tablename =='tblAliquotOrder' && o.SpecimenOrderId == so.SpecimenOrder.SpecimenOrderId })
+  so.specimenOrder.aliquotOrders = []
+  var aliquotOrders = camelCase.toLower(_.filter(rows, function(o) { return o.tablename =='tblAliquotOrder' && o.SpecimenOrderId == so.specimenOrder.specimenOrderId }))
 
   aliquotOrders.map(function (aloRaw) {
     delete aloRaw.tablename
     var alo = {
-      AliquotOrder: aloRaw
+      aliquotOrder: aloRaw
     }
-    so.SpecimenOrder.AliquotOrders.push(alo)
+    so.specimenOrder.aliquotOrders.push(alo)
   })
 }
 
 function buildPanelSetOrders(ao, rows) {
-  ao.AccessionOrder.PanelSetOrders = []
-  var panelSetOrders = _.filter(rows, function(o) { return o.tablename =='tblPanelSetOrder' })
+  ao.accessionOrder.panelSetOrders = []
+  var panelSetOrders = camelCase.toLower(_.filter(rows, function(o) { return o.tablename =='tblPanelSetOrder' }))
 
   panelSetOrders.map(function (psoRaw) {
     delete psoRaw.tablename
     var pso = {
-      PanelSetOrder: psoRaw
+      panelSetOrder: psoRaw
     }
 
     buildPanelOrders(pso, rows)
     buildTaskOrders(pso, rows)
     buildTestOrderReportDistribution(pso, rows)
 
-    ao.AccessionOrder.PanelSetOrders.push(pso)
+    ao.accessionOrder.panelSetOrders.push(pso)
   })
 }
 
 function buildTestOrderReportDistribution(pso, rows) {
-  pso.PanelSetOrder.TestOrderReportDistributions = []
-  var testOrderReportDistributions = _.filter(rows, function(o) { return o.tablename =='tblTestOrderReportDistribution' && o.ReportNo == pso.PanelSetOrder.ReportNo })
+  pso.panelSetOrder.testOrderReportDistributions = []
+  var testOrderReportDistributions = camelCase.toLower(_.filter(rows, function(o) { return o.tablename =='tblTestOrderReportDistribution' && o.ReportNo == pso.panelSetOrder.reportNo }))
   testOrderReportDistributions.map(function (tordRaw) {
     delete tordRaw.tablename
     var tord = {
-      TestOrderReportDistribution: tordRaw
+      testOrderReportDistribution: tordRaw
     }
-    pso.PanelSetOrder.TestOrderReportDistributions.push(tord)
+    pso.panelSetOrder.testOrderReportDistributions.push(tord)
   })
 }
 
 function buildPanelOrders(pso, rows) {
-  pso.PanelSetOrder.PanelOrders = []
-  var panelOrders = _.filter(rows, function(o) { return o.tablename =='tblPanelOrder' && o.ReportNo == pso.PanelSetOrder.ReportNo })
+  pso.panelSetOrder.panelOrders = []
+  var panelOrders = camelCase.toLower(_.filter(rows, function(o) { return o.tablename =='tblPanelOrder' && o.ReportNo == pso.panelSetOrder.reportNo }))
   panelOrders.map(function (poRaw) {
     delete poRaw.tablename
     var po = {
-      PanelOrder: poRaw
+      panelOrder: poRaw
     }
 
     buildTestOrders(po, rows)
-    pso.PanelSetOrder.PanelOrders.push(po)
+    pso.panelSetOrder.panelOrders.push(po)
   })
 }
 
 function buildTestOrders(po, rows) {
-  po.PanelOrder.TestOrders = []
-  var testOrders = _.filter(rows, function(o) { return o.tablename =='tblTestOrder' && o.PanelOrderId == po.PanelOrder.PanelOrderId })
+  po.panelOrder.testOrders = []
+  var testOrders = camelCase.toLower(_.filter(rows, function(o) { return o.tablename =='tblTestOrder' && o.PanelOrderId == po.panelOrder.panelOrderId }))
   testOrders.map(function (toRaw) {
     delete toRaw.tablename
     var to = {
       TestOrder: toRaw
     }
-    po.PanelOrder.TestOrders.push(to)
+    po.panelOrder.testOrders.push(to)
   })
 }
 
 function buildTaskOrders(pso, rows) {
-  pso.PanelSetOrder.TaskOrders = []
-  var taskOrders = _.filter(rows, function(o) { return o.tablename =='tblTaskOrder' && o.ReportNo == pso.PanelSetOrder.ReportNo })  
+  pso.panelSetOrder.taskOrders = []
+  var taskOrders = camelCase.toLower(_.filter(rows, function(o) { return o.tablename =='tblTaskOrder' && o.ReportNo == pso.panelSetOrder.reportNo }))
   taskOrders.map(function (toRaw) {
     delete toRaw.tablename
     var to = {
-      TaskOrder: toRaw
+      taskOrder: toRaw
     }
     buildTaskOrderDetails(to, rows)
-    pso.PanelSetOrder.TaskOrders.push(to)
+    pso.panelSetOrder.taskOrders.push(to)
   })
 }
 
 function buildTaskOrderDetails(to, rows) {
-  to.TaskOrder.TaskOrderDetails = []
-  var taskOrderDetails = _.filter(rows, function(o) { return o.tablename =='tblTaskOrderDetail' && o.TaskOrderId == to.TaskOrder.TaskOrderId })
+  to.taskOrder.taskOrderDetails = []
+  var taskOrderDetails = camelCase.toLower(_.filter(rows, function(o) { return o.tablename =='tblTaskOrderDetail' && o.TaskOrderId == to.taskOrder.taskOrderId }))
   taskOrderDetails.map(function (todRaw) {
     delete todRaw.tablename
     var tod = {
-      TaskOrderDetail: todRaw
+      taskOrderDetail: todRaw
     }
-    to.TaskOrder.TaskOrderDetails.push(tod)
+    to.taskOrder.taskOrderDetails.push(tod)
   })
 }

@@ -1,14 +1,1 @@
-{
-  "objectName": "PanelOrderAcidWash",
-  "tableName": "tblPanelOrderAcidWash",
-  "fields": [
-    {
-      "isPrimaryKey": false,
-      "name": "Result",
-      "width": "50",
-      "dataType": "string",
-      "defaultValue": "null",
-      "isNullable": "True"
-    }
-  ]
-}
+{"objectName":"panelOrderAcidWash","tableName":"tblPanelOrderAcidWash","fields":[{"isPrimaryKey":false,"name":"result","width":"50","dataType":"string","defaultValue":"null","isNullable":"True","sqlName":"Result"}]}

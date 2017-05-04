@@ -11,22 +11,30 @@ module.exports.build = (obj, clone, callback) => {
   var diffs = deepDiff(clone, obj)
   var diffsFiltered = _.filter(diffs, function (o) { return o.kind == 'A' })
   async.each(diffsFiltered, function (diff, next) {
+
     var obj = diff.item.rhs
     var objectName = Object.getOwnPropertyNames(obj)[0]
-      var sqlInsert = 'insert tbl' + objectName
-      sqlInsert = sqlInsert + ' (' + getFieldList(obj[objectName]) + ') values (' + getValueList(obj[objectName]) + ')'      
+    var sqlInsert = 'Insert '
+
+    var objectMapPath = path.join(objectPath, objectName + '.json')
+    fs.readFile(objectMapPath, function (err, value) {
+      if (err) return callback(err)
+      var objectMap = JSON.parse(value)
+      sqlInsert = sqlInsert + objectMap.tableName + ' (' + getFieldList(obj[objectName], objectMap) + ') values (' + getValueList(obj[objectName]) + ')'
       statements.push(sqlInsert)
       next()
+    })
   }, function (err) {
     callback(null, statements)
   })
 }
 
-function getFieldList(obj) {
+function getFieldList(obj, objectMap) {
   var fields = ''
   _.forOwn(obj, function (value, key) {
     if(Array.isArray(value) == false) {
-      fields += key + ', '
+      var objectMapField = _.find(objectMap.fields, function (o) { return o.name == key })
+      fields += objectMapField.sqlName + ', '
     }
   })
   return fields.substring(0, fields.length - 2)

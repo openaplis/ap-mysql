@@ -6,8 +6,9 @@ const path = require('path')
 const clone = require('clone')
 
 const aoUpdater = require('../src/core/ao-updater')
-const taskOrder = require('ap-object').TaskOrder
-const taskOrderDetail = require('ap-object').TaskOrderDetail
+const taskOrderHelper = require('ap-object').taskOrderHelper
+const taskOrderDetailHelper = require('ap-object').taskOrderHelperDetail
+const taskGeneric = require('ap-object').taskGeneric
 
 var testAO = null;
 
@@ -26,26 +27,23 @@ describe('aoUpdater', function() {
     it('Testing the updater.', function(done) {
       var aoClone = clone(testAO)
 
-      var toValues = {
-        TaskName: 'Breast Fixation Check',
-        OrderedById: 5134,
-        OrderedByInitials: 'OP'
-      }
+      testAO.accessionOrder.pLastName = 'DUCK'
+      testAO.accessionOrder.panelSetOrders[0].panelSetOrder.panelSetName = 'Going to the sun.'
 
-      testAO.AccessionOrder.PLastName = 'DUCK'
-      testAO.AccessionOrder.PanelSetOrders[0].PanelSetOrder.PanelSetName = 'Going to the sun.'
-
-      var to = taskOrder.new(testAO.AccessionOrder.PanelSetOrders[0], toValues)
-      testAO.AccessionOrder.PanelSetOrders[0].PanelSetOrder.TaskOrders.push(to)
-
-
-
-      aoUpdater.update(testAO, aoClone, function (err, result) {
-        console.log(result)
-        assert.equal(err, null)
-        done()
+      taskOrderHelper.createTaskOrder({
+        pso: testAO.accessionOrder.panelSetOrders[0],
+        tsk: taskGeneric,
+        orderedById: 5134,
+        orderedByInitials: 'OP'
+      }, function (err, to) {
+        testAO.accessionOrder.panelSetOrders[0].panelSetOrder.taskOrders.push(to)
+        aoUpdater.update(testAO, aoClone, function (err, result) {
+          console.log(result)
+          assert.equal(err, null)
+          done()
+        })
       })
-
     })
   })
+
 })

@@ -1,6 +1,9 @@
 #Schema
 schema
 
+# secrets
+secret
+
 # Logs
 logs
 *.log

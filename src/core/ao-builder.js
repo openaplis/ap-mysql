@@ -2,6 +2,7 @@ var _ = require('lodash')
 var camelCase = require('./camel-case')
 
 module.exports.build = (rows, callback) => {
+
   var aoRaw = camelCase.toLower(_.find(rows, function(o) { return o.tablename == 'tblAccessionOrder'}))
   delete aoRaw.tablename
 

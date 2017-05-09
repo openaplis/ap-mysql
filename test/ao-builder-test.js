@@ -15,8 +15,7 @@ describe('aoBuilder', function() {
       if(err) return console.log(err)
       var rows = JSON.parse(data)
       aoBuilder.build(rows, function (err, ao) {
-        testAO = ao
-        console.log('asdfasdfasdfasdfasdf')
+        testAO = ao        
         done()
       })
     })

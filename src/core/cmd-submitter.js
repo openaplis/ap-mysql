@@ -1,30 +1,34 @@
 var fs = require('fs')
 var mysql = require('mysql')
 var path = require('path')
-var mysqlConfig = require(path.resolve('../ap-secrets/secrets/mysql-config/mysqlConfig'))
+var secretClient = require('ap-secrets').secretClient
 
 module.exports.submit = (sql, callback) => {
-  var connection = mysql.createConnection(mysqlConfig.secret)
-  connection.connect()
 
-  var query = connection.query(sql)
-  var rows = []
-  var error = null;
+  secretClient.getMysqlConfig({apiKey: "1234567"}, function (err, mysqlConfig) {
+    var connection = mysql.createConnection(mysqlConfig)
+    connection.connect()
 
-  query
-    .on('error', function(err) {
-      error = err
-    })
-    .on('fields', function(fields) {
-      // the field packets for the rows to follow
-    })
-    .on('result', function(row) {
-      rows.push(Object.assign({}, row))
-    })
-    .on('end', function() {
-      if(error) return callback(error)
-      callback(null, rows)
-    })
+    var query = connection.query(sql)
+    var rows = []
+    var error = null;
 
-  connection.end()
+    query
+      .on('error', function(err) {
+        error = err
+      })
+      .on('fields', function(fields) {
+        // the field packets for the rows to follow
+      })
+      .on('result', function(row) {
+        rows.push(Object.assign({}, row))
+      })
+      .on('end', function() {
+        if(error) return callback(error)
+        callback(null, rows)
+      })
+
+    connection.end()
+  })
+
 }

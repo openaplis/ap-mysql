@@ -6,6 +6,12 @@ var secretClient = require('ap-secrets').secretClient
 module.exports.submit = (sql, callback) => {
 
   secretClient.getMysqlConfig({apiKey: "1234567"}, function (err, mysqlConfig) {
+
+    if(err) {
+      console.log(err)
+      return callback(err)
+    }
+
     var connection = mysql.createConnection(mysqlConfig)
     connection.connect()
 

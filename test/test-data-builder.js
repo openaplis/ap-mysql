@@ -37,12 +37,13 @@ function CleanPatientInfo(rows) {
 }
 
 function getMsqlTable() {
-  var sql = 'select * from tblPanelSet'
+
+  var sql = 'select * from tblCytologyScreeningImpression'
   cmdSubmitter.submit(sql, function (err, rows) {
     if(err) return console.log(err)
     var result = camelCase.toLower(rows)
     var json = JSON.stringify(result)
-    fs.writeFile(path.join(__dirname, 'panelset-data.json'), json, function (err) {
+    fs.writeFile(path.join(__dirname, 'test-data.json'), json, function (err) {
       if(err) return console.log(err)
     })
   })

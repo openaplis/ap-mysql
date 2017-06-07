@@ -47,9 +47,10 @@ var tablesexp = module.exports = {
 
     generateCreateTableFile: function(databasename, filename, callback) {
       async.series([
+
         function(callback) {
           tablesexp.removeFile(filename, function(err, result) {
-            if(err)return callback(err)
+            if(err) return callback(err)
             callback(null, result)
           })
         },

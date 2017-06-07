@@ -7,11 +7,14 @@ const aoRetriever = require('./core/ao-retriever')
 const aoUpdater = require('./core/ao-updater')
 const aoBuilder = require('./core/ao-builder')
 
+const tableList = require('./core/tables')
+
 exports = module.exports = {
   updateCmdBuilder: updateCmdBuilder,
   insertCmdBuilder: insertCmdBuilder,
   cmdSubmitter: cmdSubmitter,
   aoRetriever: aoRetriever,
   aoUpdater: aoUpdater,
-  aoBuilder: aoBuilder
+  aoBuilder: aoBuilder,
+  tableList: tableList
 }

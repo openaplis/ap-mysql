@@ -8,7 +8,7 @@ var tables = require(path.resolve('.//src/core/tables'))
 const fs = require('fs')
 
 describe('Table Create Script Tests', function() {
-  it('Table List Test', function(done) {
+/*  it('Table List Test', function(done) {
       tables.getList(function(err, data) {
         if(err) return console.log(err)
         assert.isAtLeast(data.length, 1)
@@ -40,7 +40,7 @@ describe('Table Create Script Tests', function() {
       assert.equal(result, 'success')
       done()
     })
-  })
+  })*/
 
   it('Generate full File Test', function(done){
     tables.generateCreateTableFile('test', path.join(__dirname, 'CreateTables.sql'), function(err, result) {

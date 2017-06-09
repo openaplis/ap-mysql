@@ -1,17 +1,28 @@
 'use strict'
 
+var _ = require('lodash')
+var camelCase = require('./camel-case')
 const async = require('async')
 const path = require('path')
 const cmdSubmitter = require(path.join(__dirname, 'cmd-submitter'))
 const fs = require('fs')
 
-var script = null
+var script = ''
+var data = null
 
 var self = module.exports = {
+  getTableConstraints: function(callback) {
+    var sql = 'SELECT u.TABLE_NAME tableName, 0 written, GROUP_CONCAT(u.REFERENCED_TABLE_NAME) '
+    sql += 'referencedTableName FROM INFORMATION_SCHEMA.TABLES t  join '
+    sql += 'INFORMATION_SCHEMA.KEY_COLUMN_USAGE u on t.TABLE_NAME = u.TABLE_NAME WHERE '
+    sql += 'u.TABLE_SCHEMA = \'lis\' and u.CONSTRAINT_NAME like \'fk%\' and t.TABLE_SCHEMA '
+    sql += '= \'lis\' and t.TABLE_NAME like \'tbl%\' group by t.TABLE_NAME union select '
+    sql += 'TABLE_NAME tableName, 0 written, null referencedTableName from INFORMATION_SCHEMA.TABLES '
+    sql += 'where TABLE_NAME not in (Select TABLE_NAME from '
+    sql += 'INFORMATION_SCHEMA.KEY_COLUMN_USAGE where TABLE_SCHEMA = \'lis\' and '
+    sql += 'CONSTRAINT_NAME like \'fk%\') and TABLE_SCHEMA = \'lis\' and TABLE_NAME like '
+    sql += '\'tbl%\' order by tableName;'
 
-
-  getList: function(callback) {
-    var sql = 'SELECT table_name FROM information_schema.tables WHERE table_schema = \'lis\' and table_type = \'BASE TABLE\' and TABLE_NAME like \'tbl%\';'
     cmdSubmitter.submit(sql, function(err, result) {
       if(err) return callback(err)
       callback(null, result)
@@ -23,14 +34,6 @@ var self = module.exports = {
     cmdSubmitter.submit(sql, function(err, result) {
       if(err) return callback(err)
       callback(null, result)
-    })
-  },
-
-  writeToFile: function(filename, script, callback) {
-    var dataToAppend = script + '\r\n'
-    fs.appendFile(filename, dataToAppend, function(err, result) {
-      if(err) return callback(err)
-      callback(null, 'success')
     })
   },
 
@@ -48,48 +51,127 @@ var self = module.exports = {
     })
   },
 
-  generateCreateTableFile: function(databasename, filename, callback) {
+  generateOrderedTableScriptFile: function(databasename, jsonfilename, sqlfilename, callback) {
     async.series([
 
       function(callback) {
-        self.removeFile(filename, function(err, result) {
-          if(err) return callback(err)
-          console.log('removed file')
-          callback(null, result)
+        fs.readFile(jsonfilename, function(err, result) {
+          if(err) return (err)
+          data = JSON.parse(result)
+          callback()
         })
       },
 
       function(callback) {
-        script = 'Create database ' + databasename + ';\n'
-        script += 'use ' + databasename + ';\n'
-        self.getList(function(err, tables) {
+        self.removeFile(sqlfilename, function(err, result) {
           if(err) return callback(err)
-          console.log('got table list')
-          async.eachSeries(tables, function(table, callback) {
-            self.getCreateStatement(table['table_name'], function(err, statements) {
-              if(err) return callback(err)
-              script += statements[0]['Create Table'] + ';\n'
-              console.log(statements[0]['Create Table'] + ';\n')
-              callback(null, 'success')
-            })
+          callback()
+        })
+      },
+
+      function(callback) {
+        script = 'Create database ' + databasename + ';\n\n'
+        script += 'use ' + databasename + ';\n\n'
+        async.eachSeries(data, function(table, callback) {
+          self.getCreateStatement(table['tableName'], function(err, statements) {
+            if(err) return callback(err)
+            script += statements[0]['Create Table'] + ';\n\n'
+            callback()
           })
+        }, function(err) {
+            if(err) return callback(err)
+            callback()
         })
       },
 
       function(callback) {
-        console.log('before write to file')
-        self.writeToFile(filename, script, function(err, result) {
+        fs.appendFile(sqlfilename, script, function(err, result) {
           if(err) return callback(err)
-          console.log('wrote to file')
-          callback(result)
+          callback()
         })
       }
-
     ],
-
     function(err, results) {
-     if(err) return callback(err)
-     callback(null, 'success')
+      if(err) return callback(err)
+      callback(null, 'success')
     })
+  },
+
+  generateOrderedTableFile: function(filename, callback) {
+    script = '['
+    async.series([
+      function(callback) {
+        self.removeFile(filename, function(err, result) {
+          if(err) return callback(err)
+          callback()
+        })
+      },
+
+      function(callback) {
+        self.getTableConstraints(function(err, result) {
+          if(err) return callback(err)
+          async.eachSeries(result, function(tableConstraint, callback) {
+            self.orderTables(tableConstraint, result, function(err, result) {
+              if(err) return callback(err)
+              callback()
+            })
+          },
+          function(err) {
+            if(err) return callback(err)
+            callback()
+            })
+          })
+        }
+    ],
+    function(err, results) {
+      if(err) return callback(err)
+      script = script.slice(0, -2);
+      script += ']'
+      fs.appendFile(filename, script, function(err, result) {
+        if(err) return callback(err)
+        callback(null, 'success')
+      })
+    })
+  },
+
+  orderTables: function(tableConstraint, tableConstraintArray, callback) {
+    if(tableConstraint['written'] === 0) {
+      if(tableConstraint['referencedTableName'] === null) {
+        script += '{\"' + 'tableName\":\"' + tableConstraint['tableName'] + '\" },\n'
+        tableConstraint['written'] = 1
+        callback()
+      }
+      else {
+        var referenceTables = tableConstraint['referencedTableName'].split(',')
+        async.series([
+          function(callback) {
+            async.eachSeries(referenceTables, function(referenceTable, callback) {
+              var table = _.find(tableConstraintArray, function(o) { return o.tableName === referenceTable})
+              self.orderTables(table, tableConstraintArray, function(err, result) {
+                if(err) return callback(err)
+                callback()
+              })
+            },
+            function(err) {
+              if(err) return callback(err)
+              callback()
+            })
+          },
+
+          function(callback) {
+            script += '{\"' + 'tableName\":\"' + tableConstraint['tableName'] + '\" },\n'
+            tableConstraint['written'] = 1
+            callback()
+          }
+        ],
+        function(err, results) {
+          if(err) return callback(err)
+          callback()
+        })
+      }
+    }
+    else {
+      callback()
+    }
   }
 }

@@ -20,7 +20,8 @@ module.exports = {
       {
         ping: ping,
         getUnacknowledgedTrackingNumbers: getUnacknowledgedTrackingNumbers,
-        acknowledgeTaskOrder: acknowledgeTaskOrder
+        acknowledgeTaskOrder: acknowledgeTaskOrder,
+        getAccessionOrderByMasterAccessionNo: getAccessionOrderByMasterAccessionNo
       })
     server.bind(process.env.AP_MYSQL_SERVICE_BINDING, grpc.ServerCredentials.createInsecure())
     server.start()
@@ -48,7 +49,7 @@ function getAccessionOrderByMasterAccessionNo (masterAccessionNo, callback) {
     if(err) return callback(err)
     aoBuilder.build(rows, function (err, ao) {
       if(err) return callback(err)
-      callback(null ao)
+      callback(null, ao)
     })
   })
 }

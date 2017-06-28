@@ -9,5 +9,5 @@ const mysqlService = new mysql_proto.MysqlService(process.env.AP_MYSQL_SERVICE_B
 
 mysqlService.getUnacknowledgedTrackingNumbers({ message: 'null'}, function (err, message) {
   if(err) return console.log(err)
-  console.log('GetUnacknoledgedTaskOrders returned: ' + message)
+  console.log(message)
 })

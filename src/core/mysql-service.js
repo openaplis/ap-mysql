@@ -4,6 +4,8 @@ var grpc = require('grpc')
 var path = require('path')
 
 var cmdSubmitter = require(path.join(__dirname, 'cmd-submitter'))
+var aoBuilder = require(path.join(__dirname, 'ao-builder'))
+var aoRetriever = require(path.join(__dirname, 'ao-retriever'))
 
 var PROTO_PATH = path.join(__dirname, '../../node_modules/ap-protobuf/src/core/mysql/mysql-service.proto')
 
@@ -18,7 +20,8 @@ module.exports = {
       {
         ping: ping,
         getUnacknowledgedTrackingNumbers: getUnacknowledgedTrackingNumbers,
-        acknowledgeTaskOrder: acknowledgeTaskOrder
+        acknowledgeTaskOrder: acknowledgeTaskOrder,
+        getAccessionOrderByMasterAccessionNo: getAccessionOrderByMasterAccessionNo
       })
     server.bind(process.env.AP_MYSQL_SERVICE_BINDING, grpc.ServerCredentials.createInsecure())
     server.start()
@@ -39,6 +42,16 @@ module.exports = {
 
 function ping (call, callback) {
   callback(null, { message: 'I recieved this message: ' + call.request.message } )
+}
+
+function getAccessionOrderByMasterAccessionNo (masterAccessionNo, callback) {
+  aoRetriever.retrieve(masterAccessionNo, function (err, rows) {
+    if(err) return callback(err)
+    aoBuilder.build(rows, function (err, ao) {
+      if(err) return callback(err)
+      callback(null, ao)
+    })
+  })
 }
 
 function getUnacknowledgedTrackingNumbers (call, callback) {

@@ -15,5 +15,13 @@ describe('cmdSubmitter', function() {
       }, 5000)
     })
 
+    it('lower camel case test', function(done) {
+      var sql = 'Select * from tblClient where clientId in (558, 33)'
+      cmdSubmitter.submit(sql, function (err, rows) {
+        console.log(rows)
+        done()
+      }, 5000)
+    })
+
   })
 })

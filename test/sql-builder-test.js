@@ -17,18 +17,23 @@ var inputParams = {
 
 describe('Sql Tests', function () {
   it('HPV Negative Test', function (done) {
-    var updates = hpvResultHandler.buildUpdateObject(pantherResultHPV.negative, inputParams)
-    //var result = resultHelper.getField(updates, 'tblHPVTestOrder', 'Result')
-    //assert.equal(hpvResult.negative.result, result.value)
-    var hpvUpdate = updates.find(function (item) { return item.tableName == 'tblHPVTestOrder' })
-    var psoUpdate = updates.find(function (item) { return item.tableName == 'tblPanelSetOrder' })
-    var hpvstatement = sqlBuilder.createStatement(hpvUpdate)
-    var updateStatement = 'update tblHPVTestOrder set Result = \'Negative\',Comment = \'HPV testing of unsatisfactory specimens may yield false negative results.  Recommend repeat HPV testing.\' where ReportNo = \'18-99999\';'
+    var updates = hpvResultHandler.buildUpdateObject(pantherResultHPV.negative, inputParams, function(err, updates) {
+      if(err) {
+        console.log(err)
+        assert.equal('', err)
+      } else {
+        var hpvUpdate = updates.find(function (item) { return item.tableName == 'tblHPVTestOrder' })
+        var psoUpdate = updates.find(function (item) { return item.tableName == 'tblPanelSetOrder' })
+        var hpvstatement = sqlBuilder.createStatement(hpvUpdate)
+        var updateStatement = 'update tblHPVTestOrder set Result = \'Negative\',Comment = \'HPV testing of unsatisfactory specimens may yield false negative results.  Recommend repeat HPV testing.\' where ReportNo = \'18-99999\';'
 
-    assert.equal(hpvstatement, updateStatement)
+        assert.equal(hpvstatement, updateStatement)
 
-    var psoStatement = sqlBuilder.createStatement(psoUpdate)
-    console.log(psoStatement)
-    done()
+        var psoStatement = sqlBuilder.createStatement(psoUpdate)
+        console.log(psoStatement)
+
+      }
+      done()
+    })
   })
 })

@@ -6,6 +6,7 @@ const cmdSubmitter = require('./core/cmd-submitter')
 const aoRetriever = require('./core/ao-retriever')
 const aoUpdater = require('./core/ao-updater')
 const aoBuilder = require('./core/ao-builder')
+const sqlBuilder = require('./core/sql-builder')
 
 exports = module.exports = {
   updateCmdBuilder: updateCmdBuilder,
@@ -13,5 +14,6 @@ exports = module.exports = {
   cmdSubmitter: cmdSubmitter,
   aoRetriever: aoRetriever,
   aoUpdater: aoUpdater,
-  aoBuilder: aoBuilder
+  aoBuilder: aoBuilder,
+  sqlBuilder: sqlBuilder
 }

@@ -15,5 +15,5 @@ exports = module.exports = {
   aoRetriever: aoRetriever,
   aoUpdater: aoUpdater,
   aoBuilder: aoBuilder,
-  sqlBuilder: sqlHelper
+  sqlHelper: sqlHelper
 }
